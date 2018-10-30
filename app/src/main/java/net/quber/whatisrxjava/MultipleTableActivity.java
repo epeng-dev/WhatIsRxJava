@@ -16,8 +16,8 @@ public class MultipleTableActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multiple_table);
 
-        EditText editText = findViewById(R.id.gugudan_activity_edit);
-        TextView textView = findViewById(R.id.gugudan_activity_result_text);
+        EditText editText = findViewById(R.id.multiple_table_activity_edit);
+        TextView textView = findViewById(R.id.multiple_table_activity_result_text);
 
         editText.addTextChangedListener(new TextWatcher() {
             @Override
