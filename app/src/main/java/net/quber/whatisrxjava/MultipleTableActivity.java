@@ -4,12 +4,16 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class MultipleTableActivity extends Activity {
+    private static final String TAG = "MultipleTableActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,14 +34,30 @@ public class MultipleTableActivity extends Activity {
                 Observable
                         .defer(() ->
                         {
+                            Log.d(TAG, Thread.currentThread().getName() + " defer");
                             textView.setText("");
                             return Observable.range(1, 9);
                         })
                         .map(row -> {
+                            Log.d(TAG, Thread.currentThread().getName() + " map1");
                             int dan = Integer.parseInt(editText.getText().toString());
                             return (dan + "*" + row + "=" + (dan * row));
-                        }).map(row -> row + '\n')
-                        .subscribe(textView::append, throwable -> textView.setText(throwable.getMessage()));
+                        })
+                        .map(row -> {
+                            Log.d(TAG, Thread.currentThread().getName() + " map2");
+                            return row + '\n';
+                        })
+                        .subscribeOn(Schedulers.computation())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnError(throwable -> {
+                            Log.d(TAG, Thread.currentThread().getName() + " doOnError");
+                            textView.setText("");
+                        })
+                        .subscribe(rowString -> {
+                                    Log.d(TAG, Thread.currentThread().getName() + " onNext");
+                                    textView.append(rowString);
+                                }
+                        );
             }
 
             @Override
